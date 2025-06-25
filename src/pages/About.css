@@ -1,0 +1,171 @@
+/* src/pages/About.css */
+
+.about-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdfa, #e0f7ff);
+  padding: 4rem 1.5rem;
+  animation: fadeIn 1s ease-in;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-content {
+  max-width: 1000px;
+  width: 100%;
+  background: #ffffff;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.8s ease-out;
+  transition: transform 0.4s ease, box-shadow 0.3s ease;
+}
+
+.about-content:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+.about-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #047857;
+  margin-bottom: 1.8rem;
+  animation: fadeInDown 0.6s ease-out;
+  position: relative;
+  text-align: center;
+}
+
+.about-title::after {
+  content: "";
+  width: 90px;
+  height: 4px;
+  background-color: #10b981;
+  display: block;
+  margin: 0.5rem auto 0;
+  border-radius: 4px;
+}
+
+.about-description {
+  font-size: 1.25rem;
+  color: #334155;
+  line-height: 1.85;
+  margin-bottom: 3rem;
+  text-align: center;
+  animation: fadeIn 1s ease-in;
+}
+
+.about-box {
+  background-color: #ecfdf5;
+  padding: 2.2rem;
+  border-radius: 16px;
+  text-align: left;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2.5rem;
+  transform: scale(1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.about-box:hover {
+  transform: scale(1.025);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
+}
+
+.about-box h3 {
+  font-size: 1.5rem;
+  color: #065f46;
+  margin-bottom: 1rem;
+}
+
+.about-box a {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.about-benefits {
+  text-align: left;
+  animation: fadeIn 1.2s ease;
+}
+
+.about-benefits h3 {
+  font-size: 1.5rem;
+  color: #065f46;
+  margin-bottom: 1.2rem;
+}
+
+.about-benefits ul {
+  padding-left: 1.5rem;
+  color: #475569;
+  list-style: none;
+}
+
+.about-benefits li {
+  margin-bottom: 1rem;
+  position: relative;
+  padding-left: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.about-benefits li::before {
+  content: "\2713";
+  color: #10b981;
+  font-size: 1.3rem;
+  position: absolute;
+  left: 0;
+  top: 3px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-content {
+    padding: 2rem;
+  }
+
+  .about-title {
+    font-size: 2.4rem;
+  }
+
+  .about-description {
+    font-size: 1.1rem;
+  }
+
+  .about-box h3,
+  .about-benefits h3 {
+    font-size: 1.3rem;
+  }
+
+  .about-benefits li {
+    font-size: 1rem;
+  }
+}
