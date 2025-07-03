@@ -1,0 +1,54 @@
+/* Inputs for worker form & search */
+.admin-input {
+  margin: 6px;
+  padding: 8px 12px;
+  width: 220px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* Primary action button */
+.admin-button {
+  padding: 8px 14px;
+  margin: 10px 5px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.admin-button:hover {
+  background-color: #1e40af;
+}
+
+/* Workers table */
+.admin-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
+.admin-table th,
+.admin-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+.admin-table th {
+  background-color: #f3f4f6;
+  color: #333;
+}
+.admin-table td button {
+  margin-right: 5px;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: none;
+  background-color: #e5e7eb;
+  cursor: pointer;
+}
+.admin-table td button:hover {
+  background-color: #d1d5db;
+}

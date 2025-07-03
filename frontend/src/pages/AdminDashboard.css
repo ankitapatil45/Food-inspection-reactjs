@@ -1,0 +1,93 @@
+.admin-page {
+  display: flex;
+  background-color: #f3f4f6;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.admin-sidebar {
+  position: fixed;
+  top: 72px;
+  bottom: 0;
+  width: 250px;
+  background-color: #1e3a8a;
+  color: white;
+  padding: 30px 20px;
+  transition: left 0.3s ease-in-out;
+  z-index: 100;
+}
+
+.admin-menu-header {
+  font-size: 1.6rem;
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 10px;
+}
+
+.admin-menu-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.admin-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.admin-menu-icon {
+  margin-right: 12px;
+  font-size: 1.5rem;
+}
+
+.admin-menu-button {
+  position: fixed;
+  top: 72px;
+  left: 20px;
+  padding: 10px 18px;
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.admin-content {
+  margin-left: 270px;
+  padding: 100px 40px 40px 40px;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.admin-card {
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.admin-heading {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.admin-subtext {
+  font-size: 1rem;
+  color: #555;
+}
+
+.admin-area-label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #2563eb;
+}
+
+
