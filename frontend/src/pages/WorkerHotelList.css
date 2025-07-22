@@ -1,0 +1,36 @@
+.hotel-list-container {
+  padding: 20px;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+}
+
+.hotel-list-title {
+  font-size: 24px;
+  color: #1e3a8a;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.hotel-cards-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.hotel-card {
+  background-color: #1e3a8a;
+  color: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease-in-out;
+}
+
+.hotel-card:hover {
+  transform: scale(1.03);
+}
+
+.hotel-field {
+  margin-bottom: 10px;
+  font-size: 15px;
+}

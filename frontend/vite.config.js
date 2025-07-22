@@ -6,10 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://localhost:5000', // Flask backend
+      '/api': 'http://localhost:5000',
+      '/uploads': 'http://localhost:5000',
     },
-  },
-  build: {
-    outDir: 'dist',
   },
 });

@@ -33,6 +33,7 @@ class Employee(db.Model):
     creator = db.relationship('Employee', remote_side=[id], backref='created_employees')
 
     city = db.Column(db.String(100), nullable=False)
+    
 
 class Hotel(db.Model):
     __tablename__ = 'hotels'
@@ -70,5 +71,18 @@ class Media(db.Model):
 
     employee = db.relationship('Employee', backref='media_uploads', lazy=True)
     hotel = db.relationship('Hotel', backref='hotel_media', lazy=True)
+
+
+class Location(db.Model):
+    __tablename__ = 'locations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    worker = db.relationship('Employee', backref='locations')
+
 
 print("✅ models.py loaded successfully")

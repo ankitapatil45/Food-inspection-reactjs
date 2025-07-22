@@ -1,6 +1,6 @@
-// src/pages/AddAdminForm.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./AddAdminForm.css"; // Import your CSS styles if needed
 
 export default function AddAdminForm() {
   const [formData, setFormData] = useState({
@@ -9,13 +9,14 @@ export default function AddAdminForm() {
     email: "",
     phone: "",
     password: "",
-    city: "", // ✅ 'city' instead of 'assigned_area'
+    city: "", // ✅ Superadmin assigns area as 'city'
     address: ""
   });
+
   const [areaList, setAreaList] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Load area list from backend
+  // ✅ Load predefined areas from backend
   useEffect(() => {
     axios.get("http://localhost:5000/api/areas")
       .then((res) => setAreaList(res.data))
@@ -37,7 +38,7 @@ export default function AddAdminForm() {
         }
       });
 
-      alert("Admin created successfully");
+      alert("✅ Admin created successfully");
       setFormData({
         name: "",
         username: "",
@@ -49,7 +50,7 @@ export default function AddAdminForm() {
       });
 
     } catch (err) {
-      alert(err.response?.data?.error || "Error creating admin");
+      alert(err.response?.data?.error || "❌ Error creating admin");
     } finally {
       setLoading(false);
     }

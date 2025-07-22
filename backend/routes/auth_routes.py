@@ -4,6 +4,7 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import  create_refresh_token
 from models import db, Employee
 from datetime import timedelta
 
@@ -60,22 +61,30 @@ def register_superadmin():
 
 
 
+#===========================
+#=========Login
+#=======================
+
+
+
+
+
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json(silent=True)
     if not data:
         return jsonify({'error': 'Invalid JSON'}), 400
 
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
-    if not username or not password:
-        return jsonify({'error': 'Username and password are required'}), 400
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required'}), 400
 
-    user = Employee.query.filter_by(username=username).first()
+    user = Employee.query.filter_by(email=email).first()
 
     if not user or not check_password_hash(user.password, password):
-        return jsonify({'error': 'Invalid username or password'}), 401
+        return jsonify({'error': 'Invalid email or password'}), 401
 
     if not user.is_active:
         return jsonify({'error': 'Account is inactive'}), 403
@@ -84,21 +93,31 @@ def login():
         identity=str(user.id),
         additional_claims={
             'role': user.role,
-            'username': user.username
-        },
-        expires_delta=timedelta(days=1)
+            'email': user.email
+        }
     )
 
+    refresh_token = create_refresh_token(
+        identity=str(user.id),
+        additional_claims={
+            'role': user.role,
+            'email': user.email
+        }
+    )
     user_data = {
-        'id': user.id,
-        'username': user.username,
-        'role': user.role,
-        'name': user.name,
-        'city': user.city
-    }
+    'id': user.id,
+    'username': user.username,   
+    'email': user.email,
+    'role': user.role,
+    'name': user.name,
+    'city': user.city
+}
+
+   
 
     return jsonify({
         'message': f'Login successful as {user.role}',
         'access_token': access_token,
+        'refresh_token': refresh_token,
         'user': user_data
     }), 200

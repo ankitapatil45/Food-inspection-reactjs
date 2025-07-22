@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash
-from models import Employee, db
+from models import Employee, db, Location
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 admin_bp = Blueprint('admin', __name__)
@@ -183,3 +183,34 @@ def toggle_worker_status(id):
     worker.is_active = not worker.is_active
     db.session.commit()
     return jsonify({'message': f"Worker {'activated' if worker.is_active else 'deactivated'} successfully."})
+
+
+
+
+
+
+# location worker
+
+@admin_bp.route('/admin/location', methods=['GET'])
+@jwt_required()
+def get_worker_location():
+    claims = get_jwt()
+    role = claims.get('role')
+
+    if role not in ['admin', 'superadmin']:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    worker_id = request.args.get('worker_id')
+    if not worker_id:
+        return jsonify({'error': 'worker_id is required'}), 400
+
+    latest_location = Location.query.filter_by(worker_id=worker_id).order_by(Location.timestamp.desc()).first()
+
+    if not latest_location:
+        return jsonify({'error': 'No location found'}), 404
+
+    return jsonify({
+        'latitude': latest_location.latitude,
+        'longitude': latest_location.longitude,
+        'timestamp': latest_location.timestamp
+    }), 200

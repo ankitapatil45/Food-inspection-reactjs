@@ -1,0 +1,138 @@
+.admin-list-container {
+  padding: 20px;
+  background-color: #f7f9fc;
+}
+
+.admin-list-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #1e3a8a;
+}
+
+.filter-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.filter-group label {
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+
+.filter-group input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 180px;
+}
+
+.clear-button {
+  height: 36px;
+  align-self: flex-end;
+  padding: 6px 12px;
+  background-color: #63c5da;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.clear-button:hover {
+  background-color: #52b0c4;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.edit-btn,
+.save-btn,
+.delete-btn,
+.status-btn {
+  padding: 6px 10px;
+  margin: 2px;
+  background-color: #63c5da;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.3s;
+}
+
+.edit-btn:hover,
+.save-btn:hover,
+.delete-btn:hover,
+.status-btn:hover {
+  background-color: #4fb0c7;
+}
+
+.status-active {
+  color: green;
+  font-weight: 600;
+}
+
+.status-inactive {
+  color: red;
+  font-weight: 600;
+}
+.admin-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.filter-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-container input {
+  padding: 6px 10px;
+  font-size: 14px;
+  width: 180px;
+}
+
+.filter-container .btn {
+  background-color: #63C5DA;
+  border: none;
+  padding: 6px 12px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}

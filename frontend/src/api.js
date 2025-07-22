@@ -1,61 +1,115 @@
 // src/api.js
 import axios from "axios";
 
-const API = "/api"; // 👈 Vite proxy वापरत असाल तर हे ठेवा
+const API = axios.create({
+  baseURL: "/api", // 🔄 If using Vite proxy
+  withCredentials: true,
+});
 
-// 🟢 LOGIN (admin/worker)
-export const login = async (data) => {
-  const res = await axios.post(`${API}/login`, data);
-  return res.data;
-};
+// ✅ Attach token to every request
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-export const signup = async (data) => {
-  const res = await axios.post(`${API}/signup`, data); // ✅ added
-  return res.data;
-};
-
-// 🟢 GET Workers (admin only)
-export const getWorkers = async (token) => {
-  const res = await axios.get(`${API}/admin/workers`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.data;
-};
-
-// 🟢 CREATE Hotel (admin only)
-export const createHotel = async (hotelData, token) => {
-  const res = await axios.post(`${API}/admin/create_hotel`, hotelData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.data;
-};
-
-// 🟢 GET Hotels (admin + worker)
-export const getHotels = async (token) => {
-  const res = await axios.get(`${API}/hotels`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.data;
-};
-
-// 🟢 UPLOAD Media (worker only)
-export const uploadMedia = async (formData, token) => {
-  const res = await axios.post(`${API}/worker/upload_media`, formData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return res.data;
-};
-
-// 🟢 Token getter for convenience
+// 🔐 Optional: Token getter
 export const getAuthToken = () => {
   return localStorage.getItem("token");
 };
+
+// 🟢 LOGIN
+export const login = async (data) => {
+  try {
+    const res = await API.post("/login", data);
+    return res.data;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+};
+
+// 🔴 LOGOUT
+export const logout = async () => {
+  try {
+    const res = await API.post("/logout");
+    return res.data;
+  } catch (error) {
+    console.error("Logout error:", error);
+    throw error;
+  }
+};
+
+// 🟢 SIGNUP
+export const signup = async (data) => {
+  try {
+    const res = await API.post("/signup", data);
+    return res.data;
+  } catch (error) {
+    console.error("Signup error:", error);
+    throw error;
+  }
+};
+
+// 🟢 GET Workers (admin only)
+export const getWorkers = async () => {
+  try {
+    const res = await API.get("/admin/workers");
+    return res.data;
+  } catch (error) {
+    console.error("Get Workers error:", error);
+    throw error;
+  }
+};
+
+// 🟢 CREATE Hotel (admin only)
+export const createHotel = async (hotelData) => {
+  try {
+    const res = await API.post("/admin/create_hotel", hotelData);
+    return res.data;
+  } catch (error) {
+    console.error("Create Hotel error:", error);
+    throw error;
+  }
+};
+
+// 🟢 GET Hotels (admin + worker + superadmin)
+export const getHotels = async () => {
+  try {
+    const res = await API.get("/hotels");
+    return res.data;
+  } catch (error) {
+    console.error("Get Hotels error:", error);
+    throw error;
+  }
+};
+
+// 🟢 UPLOAD Media (worker only)
+export const uploadMedia = async (formData) => {
+  try {
+    const res = await API.post("/worker/upload_media", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Upload Media error:", error);
+    throw error;
+  }
+};
+
+// 🟢 GET My Media (worker)
+export const getMedia = async () => {
+  try {
+    const res = await API.get("/media");
+    return res.data;
+  } catch (error) {
+    console.error("Get Media error:", error);
+    throw error;
+  }
+};
+
+export default API;

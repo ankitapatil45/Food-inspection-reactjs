@@ -1,0 +1,79 @@
+.admin-list-container {
+  padding: 20px;
+  background: #f9f9f9;
+}
+ 
+.admin-list-container h2 {
+  margin-bottom: 20px;
+}
+ 
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+ 
+.filter-bar input {
+  padding: 8px;
+  width: 200px;
+}
+ 
+.cancel-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+ 
+.cancel-btn:hover {
+  background-color: #dc2626;
+}
+ 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+ 
+th,
+td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+ 
+.edit-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+ 
+.delete-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+ 
+.save-btn {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+ 
+ 

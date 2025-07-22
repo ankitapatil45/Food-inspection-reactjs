@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify
 from models import Employee, Hotel, db
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from sqlalchemy import or_
 
 hotel_bp = Blueprint('hotel', __name__)
 
@@ -77,43 +78,54 @@ def update_or_delete_hotel(id):
 
 
 # ---------------------
-# List Hotels (Admin: own city, Worker: all)
+# List Hotels (super admin : All,Admin: own city, Worker: city)
 # ---------------------
 @hotel_bp.route('/hotels', methods=['GET'])
 @jwt_required()
 def list_hotels():
-    claims = get_jwt()
-    user_id = get_jwt_identity()
-
-    if claims['role'] not in ['admin', 'worker', 'superadmin']:
-        return jsonify({'error': 'Unauthorized: Admins, Superadmins, or Workers only'}), 403
-
-    name_filter = request.args.get('name')
-    location_filter = request.args.get('location')
-
-    # Build query based on role
-    if claims['role'] == 'admin':
-        admin = Employee.query.get_or_404(user_id)
-        query = Hotel.query.filter_by(city=admin.city)
-    else:  # superadmin or worker
-        query = Hotel.query
-
-    if name_filter:
-        query = query.filter(Hotel.name.ilike(f'%{name_filter}%'))
-    if location_filter:
-        query = query.filter(Hotel.location.ilike(f'%{location_filter}%'))
-
-    hotels = query.all()
-
-    return jsonify([
-        {
-            'id': hotel.id,
-            'name': hotel.name,
-            'phone': hotel.phone,
-            'address': hotel.address,
-            'location': hotel.location,
-            'city': hotel.city,
-            'created_by': hotel.created_by
-        }
-        for hotel in hotels
-    ]), 200
+    try:
+        claims = get_jwt()
+        user_id = get_jwt_identity()
+ 
+        if claims['role'] not in ['admin', 'worker', 'superadmin']:
+            return jsonify({'error': 'Unauthorized'}), 403
+ 
+        # Filters from query params
+        name_filter = request.args.get('name', '').strip()
+        city_filter = request.args.get('city', '').strip()
+ 
+        # Base query
+        if claims['role'] == 'admin':
+            admin = Employee.query.get_or_404(user_id)
+            query = Hotel.query.filter_by(city=admin.city)
+ 
+        elif claims['role'] == 'worker':
+            worker = Employee.query.get_or_404(user_id)
+            query = Hotel.query.filter_by(city=worker.city)
+ 
+        else:  # superadmin
+            query = Hotel.query
+ 
+        # Apply search filters
+        if name_filter:
+            query = query.filter(Hotel.name.ilike(f"%{name_filter}%"))
+        if city_filter:
+            query = query.filter(Hotel.city.ilike(f"%{city_filter}%"))
+ 
+        hotels = query.all()
+ 
+        return jsonify([
+            {
+                'id': hotel.id,
+                'name': hotel.name,
+                'phone': hotel.phone,
+                'address': hotel.address,
+                'location': hotel.location,
+                'city': hotel.city,
+                'created_by': hotel.created_by
+            }
+            for hotel in hotels
+        ]), 200
+ 
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500

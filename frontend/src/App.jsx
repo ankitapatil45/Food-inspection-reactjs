@@ -6,11 +6,15 @@ import "./App.css";
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
-  // Track login/logout changes based on route changes
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("");
+
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("token"));
+    const token = localStorage.getItem("token");
+    const userRole = localStorage.getItem("role");
+    setIsLoggedIn(!!token);
+    setRole(userRole || "");
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -23,7 +27,10 @@ export default function App() {
       console.error("Logout failed", err);
     } finally {
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("username");
       setIsLoggedIn(false);
+      setRole("");
       alert("Logged out successfully");
       navigate("/login");
     }
@@ -36,10 +43,27 @@ export default function App() {
         <div className="navbar-links">
           <NavLink to="/" className="navbar-link">Home</NavLink>
           <NavLink to="/about" className="navbar-link">About</NavLink>
-          {!isLoggedIn ? (
+
+          {!isLoggedIn && (
             <NavLink to="/login" className="navbar-link">Login</NavLink>
-          ) : (
-            <button onClick={handleLogout} className="logout-button">Logout</button>
+          )}
+
+          {isLoggedIn && (
+            <>
+              {/* Optional role-based dashboard shortcuts */}
+              {role === "admin" && (
+                <NavLink to="/admin/dashboard" className="navbar-link">Dashboard</NavLink>
+              )}
+              {role === "worker" && (
+                <NavLink to="/worker/dashboard" className="navbar-link">Dashboard</NavLink>
+              )}
+              {role === "superadmin" && (
+                <NavLink to="/superadmin/dashboard" className="navbar-link">Dashboard</NavLink>
+              )}
+              <button className="navbar-link logout-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
           )}
         </div>
       </nav>

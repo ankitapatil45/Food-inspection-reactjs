@@ -1,0 +1,104 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f3f4f6;
+}
+
+/* Sidebar */
+.worker-sidebar {
+  position: fixed;
+  top: 72px;
+  bottom: 0;
+  width: 200px;
+  background-color: #e0f2fe;
+  color: #0f172a;
+  overflow-y: auto;
+  z-index: 100;
+  padding-top: 10px;
+  border-right: 1px solid #cbd5e1;
+}
+
+/* Worker Info Section */
+.worker-info-section {
+  padding: 0 16px 20px;
+  border-bottom: 1px solid #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.worker-info-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.worker-info-item {
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+/* Menu Items */
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  min-height: 44px;
+  font-size: 1rem;
+  color: #1e293b;
+  transition: background-color 0.2s ease;
+}
+
+.menu-item:hover {
+  background-color: #bae6fd;
+}
+
+.menu-item.active {
+  background-color: #7dd3fc;
+  font-weight: 600;
+  border-left: 4px solid #0284c7;
+}
+
+.menu-text {
+  margin-left: 10px;
+  flex-grow: 1;
+  white-space: nowrap;
+}
+
+/* Main Content */
+.worker-main-content {
+  margin-left: 200px;
+  padding: 30px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Welcome Card */
+.worker-welcome {
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.worker-title {
+  font-size: 2rem;
+  color: #1f2937;
+  margin: 0 0 20px 0;
+}
+
+.worker-subtext {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-top: 1rem;
+}
