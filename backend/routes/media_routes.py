@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
-from models import Media, Employee, Hotel, db
+from models import Media, Employee, Hotel, City, db
 import os
+from collections import defaultdict
+from sqlalchemy.orm import joinedload
+
 
 media_bp = Blueprint("media", __name__)
 
@@ -31,13 +34,17 @@ def worker_dropdown_options():
 
     # Hotels the worker has uploaded to
     hotel_ids = db.session.query(Media.hotel_id).filter(Media.uploaded_by == user_id).distinct()
-    hotels = Hotel.query.filter(Hotel.id.in_(hotel_ids)).all()
+    
+    # Filter only active hotels
+    hotels = Hotel.query.filter(Hotel.id.in_(hotel_ids), Hotel.is_active == True).all()
 
     return jsonify({
-        'hotels': [{'id': h.id, 'name': h.name, 'city': h.city} for h in hotels]
+        'hotels': [{'id': h.id, 'name': h.name, 'city': h.city.name if h.city else None} for h in hotels]
     })
 
 ##Route
+
+import json  # Make sure this is at the top
 
 @media_bp.route('/media/worker/view', methods=['GET'])
 @jwt_required()
@@ -48,12 +55,18 @@ def worker_view_media():
     if claims['role'] != 'worker':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    query = Media.query.filter(Media.uploaded_by == user_id)
+    # Get only active hotel IDs
+    active_hotel_ids = db.session.query(Hotel.id).filter(Hotel.is_active == True).subquery()
+
+    # Filter media uploaded by this worker for active hotels only
+    query = Media.query.filter(
+        Media.uploaded_by == user_id,
+        Media.hotel_id.in_(active_hotel_ids)
+    )
 
     hotel_id = request.args.get('hotel_id')
     media_type = request.args.get('media_type')
 
-    # Convert to int only if not empty
     if hotel_id and hotel_id.isdigit():
         query = query.filter(Media.hotel_id == int(hotel_id))
     if media_type:
@@ -61,23 +74,36 @@ def worker_view_media():
 
     media_list = query.order_by(Media.uploaded_at.desc()).all()
 
-    return jsonify([
-        {
-            'id': m.id,
-            'filename': m.filename,
-            'media_type': m.media_type,
-            'description': m.description,
-            'location': m.location,
-            'uploaded_at': m.uploaded_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'file_url': f"/api/uploads/{m.filename}",
-            'hotel': {
-                'id': m.hotel.id if m.hotel else None,
-                'name': m.hotel.name if m.hotel else 'Unknown',
-                'location': m.hotel.location if m.hotel else 'Unknown',
-                'city': m.hotel.city if m.hotel else 'Unknown',
-            }
-        } for m in media_list
-    ])
+    result = []
+    for m in media_list:
+        latlon = None
+        if m.location:
+            try:
+                loc = json.loads(m.location)
+                lat = loc.get("latitude")
+                lon = loc.get("longitude")
+                if lat and lon:
+                    latlon = f"{lat},{lon}"
+            except Exception as e:
+                latlon = None  # or log error if needed
+
+        result.append({
+            "id": m.id,
+            "hotel": {
+                "id": m.hotel.id,
+                "name": m.hotel.name,
+                "city": m.hotel.city.name if m.hotel.city else None
+            },
+            "media_type": m.media_type,
+            "file_url": f"/api/uploads/{m.filename}",
+            "description": m.description,
+            "location": latlon,
+            "uploaded_at": m.uploaded_at.strftime('%Y-%m-%d %H:%M:%S')
+        })
+
+    return jsonify(result)
+
+
 
 
 #======================#======================#======================#======================#======================#======================#======================
@@ -96,15 +122,20 @@ def admin_dropdown_options():
     if claims['role'] != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    hotels = Hotel.query.filter_by(created_by=user_id).all()
-    workers = Employee.query.filter_by(created_by=user_id, role='worker').all()
+    admin = Employee.query.get_or_404(user_id)
+
+    hotels = Hotel.query.filter_by(city_id=admin.city_id, is_active=True).all()
+    workers = Employee.query.filter_by(city_id=admin.city_id, role='worker', is_active=True).all()
 
     return jsonify({
         'hotels': [{'id': h.id, 'name': h.name} for h in hotels],
         'workers': [{'id': w.id, 'name': w.name} for w in workers]
     })
 
+
 #Route
+
+import json
 
 @media_bp.route('/media/admin/view', methods=['GET'])
 @jwt_required()
@@ -117,48 +148,79 @@ def admin_view_media():
 
     admin = Employee.query.get_or_404(user_id)
 
-    # Only include workers and hotels created by this admin
-    allowed_worker_ids = db.session.query(Employee.id).filter(Employee.created_by == admin.id).subquery()
-    allowed_hotel_ids = db.session.query(Hotel.id).filter(Hotel.created_by == admin.id).subquery()
+    # Active workers and hotels only in the same city
+    allowed_worker_ids = db.session.query(Employee.id).filter(
+        Employee.city_id == admin.city_id,
+        Employee.role == 'worker',
+        Employee.is_active == True
+    ).subquery()
+
+    allowed_hotel_ids = db.session.query(Hotel.id).filter(
+        Hotel.city_id == admin.city_id,
+        Hotel.is_active == True
+    ).subquery()
 
     query = Media.query.filter(
-        (Media.uploaded_by.in_(allowed_worker_ids)) |
-        (Media.hotel_id.in_(allowed_hotel_ids))
+        Media.uploaded_by.in_(allowed_worker_ids),
+        Media.hotel_id.in_(allowed_hotel_ids)
     )
 
+    # Optional filters
     worker_id = request.args.get('worker_id')
     hotel_id = request.args.get('hotel_id')
     media_type = request.args.get('media_type')
 
-    if worker_id:
-        query = query.filter(Media.uploaded_by == worker_id)
-    if hotel_id:
-        query = query.filter(Media.hotel_id == hotel_id)
+    if worker_id and worker_id.isdigit():
+        query = query.filter(Media.uploaded_by == int(worker_id))
+    if hotel_id and hotel_id.isdigit():
+        query = query.filter(Media.hotel_id == int(hotel_id))
     if media_type:
         query = query.filter(Media.media_type == media_type)
 
     media_list = query.order_by(Media.uploaded_at.desc()).all()
 
-    return jsonify([
-        {
+    result = []
+    for m in media_list:
+        latlon = None
+        if m.location:
+            try:
+                loc = json.loads(m.location)
+                lat = loc.get("latitude")
+                lon = loc.get("longitude")
+                if lat and lon:
+                    latlon = f"{lat},{lon}"
+            except Exception:
+                latlon = None
+
+        result.append({
             'id': m.id,
             'filename': m.filename,
             'media_type': m.media_type,
             'description': m.description,
-            'location': m.location,
+            'location': latlon,
             'uploaded_at': m.uploaded_at.strftime('%Y-%m-%d %H:%M:%S'),
             'file_url': f"/api/uploads/{m.filename}",
             'worker': {
                 'id': m.employee.id if m.employee else None,
-                'name': m.employee.name if m.employee else 'Unknown'
+                'name': m.employee.name if m.employee else 'Unknown',
+                'city': {
+                    'id': m.employee.city.id,
+                    'name': m.employee.city.name
+                } if m.employee and m.employee.city else 'Unknown'
             },
             'hotel': {
                 'id': m.hotel.id if m.hotel else None,
                 'name': m.hotel.name if m.hotel else 'Unknown',
                 'location': m.hotel.location if m.hotel else 'Unknown',
+                'city': {
+                    'id': m.hotel.city.id,
+                    'name': m.hotel.city.name
+                } if m.hotel and m.hotel.city else 'Unknown'
             }
-        } for m in media_list
-    ])
+        })
+
+    return jsonify(result)
+
 
 #======================#======================#======================#======================#======================#======================#======================
 # ---------------------
@@ -167,79 +229,86 @@ def admin_view_media():
 
 #            superadmin_dropdown
 #==========================
-@media_bp.route('/media/superadmin/options', methods=['GET'])
+
+def _parse_location(location_str):
+    try:
+        data = eval(location_str) if isinstance(location_str, str) else location_str
+        lat = data.get("latitude") or data.get("lat")
+        lon = data.get("longitude") or data.get("lon")
+        return f"{lat},{lon}" if lat and lon else None
+    except:
+        return None
+
+
+
+
+
+# --- Flask Backend Route ---
+
+@media_bp.route("/media/superadmin/options", methods=["GET"])
 @jwt_required()
-def superadmin_dropdown_options():
-    claims = get_jwt()
-    if claims['role'] != 'superadmin':
-        return jsonify({'error': 'Unauthorized'}), 403
+def get_superadmin_media_options():
+    cities = City.query.all()
 
-    superadmin_id = get_jwt_identity()
+    # Get all active hotels
+    hotels = Hotel.query.options(joinedload(Hotel.city)).filter(
+        Hotel.is_active == True
+    ).all()
 
-    # Get admins created by this superadmin
-    admins = Employee.query.filter_by(created_by=superadmin_id, role='admin').all()
-    admin_ids = [admin.id for admin in admins]
-
-    # Get hotels created by those admins
-    hotels = Hotel.query.filter(Hotel.created_by.in_(admin_ids)).all()
-    hotel_ids = [hotel.id for hotel in hotels]
-
-    # Get workers created by those admins
-    workers = Employee.query.filter(Employee.created_by.in_(admin_ids), Employee.role == 'worker').all()
-
-    # Extract unique areas from those hotels
-    areas = list(set(h.city for h in hotels))
+    # Get all active workers whose city_id matches the city of any hotel
+    active_city_ids = {h.city_id for h in hotels}
+    workers = Employee.query.options(joinedload(Employee.city)).filter(
+        Employee.role == "worker",
+        Employee.is_active == True,
+        Employee.city_id.in_(active_city_ids)
+    ).all()
 
     return jsonify({
-        'areas': areas,
-        'hotels': [{'id': h.id, 'name': h.name, 'city': h.city} for h in hotels],
-        'workers': [{'id': w.id, 'name': w.name, 'city': w.city} for w in workers]
+        "areas": [{"id": c.id, "name": c.name} for c in cities],
+        "hotels": [
+            {
+                "id": h.id,
+                "name": h.name,
+                "city_id": h.city.id if h.city else None
+            } for h in hotels
+        ],
+        "workers": [
+            {
+                "id": w.id,
+                "name": w.name,
+                "city_id": w.city.id if w.city else None
+            } for w in workers
+        ]
     })
 
 
-
-###Route
 
 @media_bp.route('/media/superadmin/view', methods=['GET'])
 @jwt_required()
 def superadmin_view_media():
     claims = get_jwt()
-    superadmin_id = get_jwt_identity()
-
     if claims['role'] != 'superadmin':
         return jsonify({'error': 'Unauthorized'}), 403
 
-    # Step 1: Get admins created by this superadmin
-    admins = Employee.query.filter_by(created_by=superadmin_id, role='admin').all()
-    admin_ids = [admin.id for admin in admins]
-
-    # Step 2: Get hotels and workers created by those admins
-    hotels = Hotel.query.filter(Hotel.created_by.in_(admin_ids)).all()
-    hotel_ids = [h.id for h in hotels]
-
-    workers = Employee.query.filter(Employee.created_by.in_(admin_ids), Employee.role == 'worker').all()
-    worker_ids = [w.id for w in workers]
-
-    # Step 3: Start query with allowed hotel or worker matches
-    query = Media.query.filter(
-        db.or_(
-            Media.hotel_id.in_(hotel_ids),
-            Media.uploaded_by.in_(worker_ids)
-        )
+    query = Media.query.options(
+        joinedload(Media.employee).joinedload(Employee.city),
+        joinedload(Media.hotel).joinedload(Hotel.city)
     )
 
-    # Step 4: Apply filters
-    area = request.args.get('area')
+    area = request.args.get('area_id')
     hotel_id = request.args.get('hotel_id')
     worker_id = request.args.get('worker_id')
     media_type = request.args.get('media_type')
 
     if area:
-        query = query.join(Hotel).filter(Hotel.city == area)
+        query = query.join(Hotel).join(City).filter(City.id == int(area))
+
     if hotel_id:
         query = query.filter(Media.hotel_id == int(hotel_id))
+
     if worker_id:
         query = query.filter(Media.uploaded_by == int(worker_id))
+
     if media_type:
         query = query.filter(Media.media_type == media_type)
 
@@ -251,22 +320,32 @@ def superadmin_view_media():
             'filename': m.filename,
             'media_type': m.media_type,
             'description': m.description,
-            'location': m.location,
+            'location': _parse_location(m.location),
             'uploaded_at': m.uploaded_at.strftime('%Y-%m-%d %H:%M:%S'),
             'file_url': f"/api/uploads/{m.filename}",
+            'uploaded_by_name': m.employee.name if m.employee else 'Unknown',
             'worker': {
                 'id': m.employee.id if m.employee else None,
                 'name': m.employee.name if m.employee else 'Unknown',
-                'city': m.employee.city if m.employee else 'Unknown'
+                'city': {
+                    'id': m.employee.city.id,
+                    'name': m.employee.city.name
+                } if m.employee and m.employee.city else 'Unknown'
             },
             'hotel': {
                 'id': m.hotel.id if m.hotel else None,
                 'name': m.hotel.name if m.hotel else 'Unknown',
                 'location': m.hotel.location if m.hotel else 'Unknown',
-                'city': m.hotel.city if m.hotel else 'Unknown'
+                'city': {
+                    'id': m.hotel.city.id,
+                    'name': m.hotel.city.name
+                } if m.hotel and m.hotel.city else 'Unknown'
             }
-        } for m in media_list
+        }
+        for m in media_list
     ])
+
+
 
 
 #==============================================================

@@ -1,58 +1,139 @@
-.add-admin-form {
-  background: #fff;
+/* Full page wrapper */
+.admin-page-wrapper {
+  min-height: 100vh;
+  background-color: #e0f4fb;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 60px;
+}
+
+/* Form container */
+.add-admin-form-container {
+  background: white;
   padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
   max-width: 600px;
-  margin: 0 auto;
-  font-family: 'Segoe UI', sans-serif;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.add-admin-form h3 {
+/* Heading */
+.add-admin-form-container h2 {
   text-align: center;
-  margin-bottom: 25px;
-  color: #333;
-  font-size: 1.6rem;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #0e7490;
 }
 
-.add-admin-form form {
+/* Form layout */
+.admin-form-stacked {
   display: flex;
   flex-direction: column;
-  gap: 15px;
 }
 
-.add-admin-form input,
-.add-admin-form select {
-  padding: 12px 15px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #0e7490;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #94d2e5;
   font-size: 1rem;
-  transition: border-color 0.3s;
+  height: 38px;
+  box-sizing: border-box;
+  background-color: white;
 }
 
-.add-admin-form input:focus,
-.add-admin-form select:focus {
-  border-color: #007bff;
+/* Phone input */
+.phone-input-wrapper {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.phone-prefix {
+  background-color: #f0f9ff;
+  padding: 0 12px;
+  border: 1px solid #94d2e5;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  font-size: 1rem;
+  color: #0e7490;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+}
+
+.phone-input-wrapper input[type="tel"] {
+  flex: 1;
+  padding: 0 10px;
+  border: 1px solid #94d2e5;
+  border-radius: 0 6px 6px 0;
+  font-size: 1rem;
+  height: 38px;
+  background-color: white;
   outline: none;
 }
 
-.add-admin-form button {
-  background-color: #007bff;
-  color: white;
-  padding: 12px 16px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+/* City fields layout */
+.city-fields-wrapper {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.add-admin-form button:hover {
-  background-color: #0056b3;
+.city-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.city-field button {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #c7f0ff;
+  color: #0e7490;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"] {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background-color: #0ea5e9; /* Bright sky blue */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(14, 165, 233, 0.2);
+}
+
+button[type="submit"]:hover {
+  background-color: #0284c7; /* Slightly darker blue */
   transform: translateY(-1px);
 }
 
-.add-admin-form button:disabled {
-  background-color: #aaa;
+button[type="submit"]:disabled {
+  background-color: #94d2e5; /* Disabled state */
   cursor: not-allowed;
+  box-shadow: none;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import API from "../utils/axiosAuth";
-import "./SearchAdminWithWorkers.css";
+import "./AdminSearchWithWorkers.css";
 
 export default function SearchAdminWithWorkers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,6 +49,12 @@ export default function SearchAdminWithWorkers() {
             <p><strong>Username:</strong> {result.admin.username}</p>
             <p><strong>Phone:</strong> {result.admin.phone}</p>
             <p><strong>City:</strong> {result.admin.city}</p>
+            <p>
+              <strong>Status:</strong>{" "}
+              <span style={{ color: result.admin.is_active ? "green" : "red" }}>
+                {result.admin.is_active ? "Active" : "Inactive"}
+              </span>
+            </p>
           </div>
 
           <div className="workers-section">
@@ -63,6 +69,7 @@ export default function SearchAdminWithWorkers() {
                     <th>Username</th>
                     <th>Phone</th>
                     <th>City</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -72,6 +79,9 @@ export default function SearchAdminWithWorkers() {
                       <td>{w.username}</td>
                       <td>{w.phone}</td>
                       <td>{w.city}</td>
+                      <td style={{ color: w.is_active ? "green" : "red" }}>
+                        {w.is_active ? "Active" : "Inactive"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

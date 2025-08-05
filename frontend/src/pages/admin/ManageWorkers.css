@@ -1,0 +1,62 @@
+.workers-page {
+  max-width: 600px;
+  margin: 30px auto;
+  background: #f0f9ff; /* Matches sidebar bg tone */
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.admin-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  color: #1e3a8a; /* Dark blue for headings */
+  font-weight: 600;
+}
+
+.create-worker-form .form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-worker-form label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #1e293b; /* Slate gray */
+}
+
+.create-worker-form input {
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fff;
+  color: #0f172a;
+}
+
+.admin-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background-color: #0284c7; /* Blue */
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.admin-button:hover {
+  background-color: #0369a1; /* Darker blue */
+}
+
+.loading-text {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.2rem;
+  color: #475569; /* Muted gray-blue */
+}

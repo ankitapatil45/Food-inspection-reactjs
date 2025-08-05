@@ -1,3 +1,13 @@
+/* === PAGE BACKGROUND === */
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff; /* very light green page background */
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+ 
+/* === LOGIN CENTER === */
 .login-center {
   position: absolute;
   top: 50%;
@@ -5,40 +15,66 @@
   transform: translate(-50%, -50%);
 }
  
+/* === LOGIN BOX === */
 .login-box {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background: #ffffff; /* 🌿 Single solid light green color */
+  padding: 30px 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   width: 320px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  font-family: 'Segoe UI', sans-serif;
+  border: 1px solid #141c1c;
 }
  
+/* === HEADING === */
 .login-box h2 {
   margin-bottom: 10px;
   text-align: center;
+  font-weight: bold;
+  color: #1b5e20; /* dark green for contrast */
 }
  
-.login-box input,
-.login-box select,
-.login-box button {
+/* === LABELS === */
+.login-box label {
+  font-size: 14px;
+  color: #69806a;
+  margin-top: 8px;
+}
+ 
+/* === INPUTS === */
+.login-box input {
   padding: 10px;
   font-size: 16px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #0f0f0f;
+  margin-bottom: 6px;
 }
  
+.login-box input::placeholder {
+  color: #0e0d0d;
+}
+ 
+/* === BUTTON === */
 .login-box button {
-  background-color: #2563eb;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #66bb6a; /* green */
   color: white;
+  font-weight: bold;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+ 
+.login-box button:hover {
+  background-color: #ffffff;
 }
  
 .login-box button:disabled {
-  background-color: #7aa7f9;
+  background-color: #c8e6c9;
   cursor: not-allowed;
 }

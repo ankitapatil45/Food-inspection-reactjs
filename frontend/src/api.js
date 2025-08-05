@@ -77,14 +77,26 @@ export const createHotel = async (hotelData) => {
 
 // 🟢 GET Hotels (admin + worker + superadmin)
 export const getHotels = async () => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("userRole");
+
+  let url = "/hotels"; // default for admin/superadmin
+  if (role === "worker") {
+    url = "/worker/hotels";
+  }
+
   try {
-    const res = await API.get("/hotels");
+    const res = await API.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return res.data;
   } catch (error) {
     console.error("Get Hotels error:", error);
     throw error;
   }
 };
+
+
 
 // 🟢 UPLOAD Media (worker only)
 export const uploadMedia = async (formData) => {

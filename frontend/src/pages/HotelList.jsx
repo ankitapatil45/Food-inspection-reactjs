@@ -1,186 +1,256 @@
-import React, { useEffect, useState } from "react";
-import API from "../utils/axiosAuth";
-import "./AdminList.css"; // Reuse consistent styling
- 
-function HotelList() {
+import React, { useState, useEffect } from 'react';
+import API from '../utils/axiosAuth';
+import './HotelList.css';
+
+export default function ManageHotels() {
   const [hotels, setHotels] = useState([]);
-  const [editingHotelId, setEditingHotelId] = useState(null);
-  const [editedHotel, setEditedHotel] = useState({});
-  const [filters, setFilters] = useState({ name: "", city: "" });
- 
+  const [formData, setFormData] = useState({
+    name: '', phone: '', address: '', location: ''
+  });
+  const [editId, setEditId] = useState(null);
+  const [filters, setFilters] = useState({ name: '', city: '', status: 'active' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
   useEffect(() => {
     fetchHotels();
   }, [filters]);
- 
+
   const fetchHotels = () => {
-    let query = "/hotels";
-    const params = [];
- 
-    if (filters.name.trim()) params.push(`name=${filters.name.trim()}`);
-    if (filters.city.trim()) params.push(`city=${filters.city.trim()}`);
-    if (params.length) query += `?${params.join("&")}`;
- 
-    API.get(query)
-      .then((res) => setHotels(res.data))
-      .catch((err) =>
-        alert(err.response?.data?.error || "Failed to load hotels")
-      );
-  };
- 
-  const handleEdit = (hotel) => {
-    setEditingHotelId(hotel.id);
-    setEditedHotel({ ...hotel });
-  };
- 
-  const handleCancel = () => {
-    setEditingHotelId(null);
-    setEditedHotel({});
-  };
- 
-  const handleChange = (e) => {
-    setEditedHotel({ ...editedHotel, [e.target.name]: e.target.value });
-  };
- 
-  const handleSave = () => {
-    API.put(`/admin/hotel/${editingHotelId}`, editedHotel)
-      .then(() => {
-        alert("Hotel updated successfully");
-        fetchHotels();
-        handleCancel();
+    setIsLoading(true);
+    API.get('/hotel')
+      .then(res => {
+        let filtered = res.data;
+
+        // Apply filters
+        if (filters.name) {
+          filtered = filtered.filter(h => h.name.toLowerCase().includes(filters.name.toLowerCase()));
+        }
+        if (filters.city) {
+          filtered = filtered.filter(h => (h.city || '').toLowerCase().includes(filters.city.toLowerCase()));
+        }
+        filtered = filtered.filter(h => h.is_active === (filters.status === 'active'));
+
+        setHotels(filtered);
+        setIsLoading(false);
       })
-      .catch((err) =>
-        alert(err.response?.data?.error || "Failed to update hotel")
-      );
+      .catch(err => {
+        showMessage('error', err.response?.data?.error || 'Failed to load hotels');
+        setIsLoading(false);
+      });
   };
- 
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Only update hotel
+    if (editId) {
+      API.put(`/hotel/${editId}`, formData)
+        .then(() => {
+          fetchHotels();
+          setFormData({ name: '', phone: '', address: '', location: '' });
+          setEditId(null);
+          setIsLoading(false);
+        })
+        .catch(err => {
+          showMessage('error', err.response?.data?.error || 'Action failed');
+          setIsLoading(false);
+        });
+    }
+  };
+
   const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this hotel?")) return;
-    API.delete(`/admin/hotel/${id}`)
-      .then(() => {
-        alert("Hotel deleted successfully");
-        fetchHotels();
+    if (window.confirm("Are you sure you want to delete this hotel?")) {
+      setIsLoading(true);
+      API.delete(`/hotel/${id}`)
+        .then(() => {
+          fetchHotels();
+          setIsLoading(false);
+        })
+        .catch(err => {
+          showMessage('error', err.response?.data?.error || 'Delete failed');
+          setIsLoading(false);
+        });
+    }
+  };
+
+  const toggleStatus = (id) => {
+    API.put(`/hotel/${id}/toggle-status`)
+      .then(response => {
+        const newStatus = response.data.status;
+        setHotels(prevHotels =>
+          prevHotels.map(h =>
+            h.id === id ? { ...h, is_active: newStatus } : h
+          )
+        );
       })
-      .catch((err) =>
-        alert(err.response?.data?.error || "Failed to delete hotel")
-      );
+      .catch(err => {
+        showMessage('error', err.response?.data?.error || 'Status update failed');
+      });
   };
- 
+
+  const handleEdit = (hotel) => {
+    setFormData({
+      name: hotel.name,
+      phone: hotel.phone,
+      address: hotel.address,
+      location: hotel.location
+    });
+    setEditId(hotel.id);
+  };
+
+  const showMessage = (type, text) => {
+    if (type === 'success') return;
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+  };
+
   const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
   };
- 
+
   const clearFilters = () => {
-    setFilters({ name: "", city: "" });
+    setFilters({ name: '', city: '', status: 'active' });
   };
- 
+
+  const handleStatusFilter = (status) => {
+    setFilters(prev => ({ ...prev, status }));
+  };
+
   return (
-    <div className="admin-list-container">
-      <h2 className="admin-title">Hotel List</h2>
- 
-      <div className="filter-container">
+    <div className="hotels-page">
+      <h2>Super Admin Dashboard - Manage Hotels</h2>
+      {message.text && (
+        <div className={`message ${message.type}`}>{message.text}</div>
+      )}
+
+      {/* Filter section */}
+      <div className="filter-bar">
         <input
           type="text"
+          placeholder="Search by Hotel Name"
           name="name"
-          placeholder="Filter by Name"
           value={filters.name}
           onChange={handleFilterChange}
         />
         <input
           type="text"
+          placeholder="Search by City"
           name="city"
-          placeholder="Filter by City"
           value={filters.city}
           onChange={handleFilterChange}
         />
-        <button className="btn" onClick={clearFilters}>
+        <button className="admin-button" onClick={clearFilters}>
           Clear Filters
         </button>
+        <button
+          className={`admin-button ${filters.status === 'active' ? 'active' : 'inactive'}`}
+          onClick={() =>
+            handleStatusFilter(filters.status === 'active' ? 'inactive' : 'active')
+          }
+        >
+          {filters.status === 'active' ? 'Show Inactive' : 'Show Active'}
+        </button>
       </div>
- 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Location</th>
-            <th>City</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {hotels.map((hotel) => (
-            <tr key={hotel.id}>
-              {editingHotelId === hotel.id ? (
-                <>
-                  <td>
-                    <input
-                      name="name"
-                      value={editedHotel.name}
-                      onChange={handleChange}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      name="phone"
-                      value={editedHotel.phone}
-                      onChange={handleChange}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      name="address"
-                      value={editedHotel.address}
-                      onChange={handleChange}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      name="location"
-                      value={editedHotel.location}
-                      onChange={handleChange}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      name="city"
-                      value={editedHotel.city}
-                      onChange={handleChange}
-                    />
-                  </td>
-                  <td>
-                    <button className="btn" onClick={handleSave}>
-                      Save
-                    </button>
-                    <button className="btn" onClick={handleCancel}>
-                      Cancel
-                    </button>
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td>{hotel.name}</td>
-                  <td>{hotel.phone}</td>
-                  <td>{hotel.address}</td>
-                  <td>{hotel.location}</td>
-                  <td>{hotel.city}</td>
-                  <td>
-                    <button className="btn" onClick={() => handleEdit(hotel)}>
-                      Edit
-                    </button>
-                    <button className="btn" onClick={() => handleDelete(hotel.id)}>
-                      Delete
-                    </button>
-                  </td>
-                </>
-              )}
+
+      {/* Form for editing hotels */}
+      {editId && (
+        <form onSubmit={handleSubmit} className="hotel-form">
+          <input
+            type="text"
+            placeholder="Hotel Name"
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Phone"
+            value={formData.phone}
+            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Address"
+            value={formData.address}
+            onChange={e => setFormData({ ...formData, address: e.target.value })}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Location"
+            value={formData.location}
+            onChange={e => setFormData({ ...formData, location: e.target.value })}
+            required
+          />
+          <button type="submit" className="admin-button">
+            Update Hotel
+          </button>
+        </form>
+      )}
+
+      {/* Table */}
+      {isLoading ? (
+        <p>Loading hotels...</p>
+      ) : (
+        <table className="hotel-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Location</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {hotels.map(h => (
+              <tr key={h.id}>
+                <td>{h.name}</td>
+                <td>{h.phone}</td>
+                <td>{h.address}</td>
+                <td>{h.location}</td>
+                <td>{h.city || 'N/A'}</td>
+                <td>
+                  <span
+                    style={{
+                      color: h.is_active ? 'green' : 'red',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {h.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    className="admin-button edit"
+                    onClick={() => handleEdit(h)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className={`admin-button toggle ${h.is_active ? 'inactive' : 'active'}`}
+                    onClick={() => toggleStatus(h.id)}
+                  >
+                    {h.is_active ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button
+                    className="admin-button delete"
+                    onClick={() => handleDelete(h.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
- 
-export default HotelList;
- 

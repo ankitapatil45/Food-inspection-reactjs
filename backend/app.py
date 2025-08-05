@@ -3,6 +3,7 @@ from flask import Flask, send_from_directory
 from models import db
 from config import Config
 from flask_cors import CORS
+from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from token_blacklist import blacklist
 import os

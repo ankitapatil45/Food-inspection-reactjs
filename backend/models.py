@@ -1,4 +1,3 @@
-
 # backend/models.py
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -9,12 +8,19 @@ ist = pytz.timezone('Asia/Kolkata')
 def ist_now():
     return datetime.now(ist).replace(tzinfo=None)  # Remove tzinfo to avoid issues in SQLite
 
-
 db = SQLAlchemy()
 
+class City(db.Model):
+    __tablename__ = 'cities'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+
+    employees = db.relationship('Employee', back_populates='city', lazy=True)
+    hotels = db.relationship('Hotel', back_populates='city', lazy=True)
 
 
-class Employee(db.Model):
+class Employee(db.Model): 
     __tablename__ = 'employees'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -32,8 +38,9 @@ class Employee(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('employees.id'))
     creator = db.relationship('Employee', remote_side=[id], backref='created_employees')
 
-    city = db.Column(db.String(100), nullable=False)
-    
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
+    city = db.relationship('City', back_populates='employees')
+
 
 class Hotel(db.Model):
     __tablename__ = 'hotels'
@@ -43,10 +50,13 @@ class Hotel(db.Model):
     phone = db.Column(db.String(15), nullable=False)
     address = db.Column(db.String(200), nullable=False)
     location = db.Column(db.String(100), nullable=False)
-    city = db.Column(db.String(100), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
 
+    city = db.relationship('City', back_populates='hotels')
     created_by = db.Column(db.Integer, db.ForeignKey('employees.id'))
     creator = db.relationship('Employee', backref='hotels')
+
 
 class Certificate(db.Model):
     __tablename__ = 'certificates'
@@ -55,6 +65,7 @@ class Certificate(db.Model):
     certificate = db.Column(db.LargeBinary, nullable=False)
     hotel_id = db.Column(db.Integer, db.ForeignKey('hotels.id'), nullable=False)
     hotel = db.relationship('Hotel', backref='certificates')
+
 
 class Media(db.Model):
     __tablename__ = 'media'

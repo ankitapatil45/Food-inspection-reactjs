@@ -1,40 +1,39 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
+ 
 import App from './App';
-import Home from './pages/Home';
-import About from './pages/About';
+ 
+ 
 import Login from './pages/Login';
-
-import AdminDashboard from './pages/AdminDashboard';
-import WorkerDashboard from './pages/WorkerDashboard';
+ 
+import AdminDashboard from './pages/admin/AdminDashboard';
+import WorkerDashboard from './pages/worker/WorkerDashboard';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
-
+ 
 import ProtectedRoute from './components/ProtectedRoute';
-
-import SubmitVideo from './pages/SubmitVideo';
-import WorkerHotelList from './pages/WorkerHotelList';
-import WorkerLocation from './pages/WorkerLocation';
-import WorkerMedia from './pages/WorkerMedia';
-
-import AdminWorkerLocation from './pages/AdminWorkerLocation';
-import AllWorkersList from './pages/AllWorkersList';
-import ManageWorkers from './pages/ManageWorkers';
-
-import AdminMedia from './pages/AdminMedia';
+ 
+import SubmitVideo from './pages/worker/SubmitVideo';
+import WorkerHotelList from './pages/worker/WorkerHotelList';
+import WorkerLocation from './pages/worker/WorkerLocation';
+import WorkerMedia from './pages/worker/WorkerMedia';
+ 
+import AdminWorkerLocation from './pages/admin/AdminWorkerLocation';
+import AllWorkersList from './pages/admin/AllWorkersList';
+import ManageWorkers from './pages/admin/ManageWorkers';
+ 
+import AdminMedia from './pages/admin/AdminMedia';
 import SuperAdminMedia from './pages/SuperAdminMedia';
-
+ 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />}>
           {/* Public routes */}
-          <Route index element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path="login" element={<Login />} />
-          
+          <Route index element={<Login />} />
+         
+         
           {/* Super Admin */}
           <Route
             path="superadmin/dashboard"
@@ -60,7 +59,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               </ProtectedRoute>
             }
           />
-
+ 
           {/* Worker */}
           <Route
             path="worker/dashboard"
@@ -102,7 +101,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               </ProtectedRoute>
             }
           />
-
+ 
           {/* Admin */}
           <Route
             path="admin/dashboard"
