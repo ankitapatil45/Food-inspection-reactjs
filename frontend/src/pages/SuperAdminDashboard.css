@@ -1,109 +1,104 @@
 .admin-dashboard-container {
   display: flex;
   height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f0f4f8; /* lighter background for contrast */
-  padding: 0;
-  box-sizing: border-box;
-}
- 
-/* Sidebar matching navbar theme */
-.admin-sidebar {
-  width: 180px;
-  background: linear-gradient(to bottom, #0f766e, #0ea5e9);
-  color: white;
-  padding: 16px 8px;
-  display: flex;
-  flex-direction: column;
-  border-top-right-radius: 30px;
-  border-bottom-right-radius: 30px;
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
-  height: calc(100vh - 32px);
   overflow: hidden;
 }
- 
-/* Admin info section */
-.admin-info-section {
-  margin-bottom: 20px;
+
+.admin-sidebar {
+  width: 210px;
+  background: linear-gradient(to bottom, #00796b, #00bcd4);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  transition: all 0.3s ease;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  overflow-y: hidden;
 }
- 
-.admin-info-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ffffff;
-}
- 
-.admin-info-item {
-  font-size: 14px;
-  color: #e0f2f1;
-}
- 
-/* Sidebar scroll */
-.sidebar-content {
-  flex-grow: 1;
+
+.admin-sidebar.scroll-on-hover:hover {
   overflow-y: auto;
 }
- 
-/* Menu items */
+
+.admin-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+}
+
+.admin-info-section {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-info-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.admin-info-item {
+  font-size: 0.95rem;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  padding: 7px;
+}
+
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 1px;
-  padding: 10px 14px;
-  margin: 1px 0;
-  border-radius: 4px;
+  gap: 7px;
+  padding: 10px 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-  color: #e0f2f1;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  margin-bottom: 5px;
 }
- 
+
 .menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15);
 }
- 
+
 .menu-item.active {
-  background-color: #1e3a8a;
-  font-weight: 500;
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.3);
+  font-weight: bold;
 }
- 
-/* Main content area */
+
+.icon {
+  font-size: 1.1rem;
+}
+
+.menu-text {
+  font-size: 1rem;
+}
+
 .admin-main-content {
-  flex-grow: 1;
-  padding: 10px;
-  background-color: white;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  padding: 25px;
+  background: #f5f9fd;
+  overflow-y: auto;
 }
- 
-/* Welcome section */
+
 .admin-welcome {
   text-align: center;
-  max-width: 600px;
-  margin: 0 auto;
-  padding-top: 40px;
+  margin-top: 60px;
 }
- 
+
 .admin-title {
-  font-size: 32px;
-  color: #0f766e;
-  margin-bottom: 16px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #004d40;
 }
- 
+
 .admin-subtext {
-  font-size: 16px;
-  color: #1e293b;
-  line-height: 1.6;
-}
-body {
-  margin: 0;              
-  padding: 0;
-}
- 
- 
-.menu-item svg {
-  margin-left: -9px;      /* ✅ icon थोडा left ला move केला */
-  flex-shrink: 0;         /* icon छोटा होणार नाही */
+  font-size: 1.1rem;
+  color: #555;
+  margin-top: 8px;
 }

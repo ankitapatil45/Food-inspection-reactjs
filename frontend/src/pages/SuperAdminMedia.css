@@ -1,8 +1,5 @@
 .worker-media-wrapper {
-  margin: 0;
-  padding: 90px 40px 40px;
-  margin-left: 10px; /* Sidebar offset */
-  margin-top: -50px;  /* Remove top space */
+  padding: 100px 40px 40px;
   background-color: #f9fafb;
   min-height: 100vh;
   box-sizing: border-box;
@@ -10,106 +7,126 @@
 }
 
 .worker-media-container {
-  padding-top: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .media-title {
-  font-size: 1.8rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
   color: #1e3a8a;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
 .filters-container {
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
-  align-items: center;
   flex-wrap: wrap;
-}
-
-.filters-container label {
-  display: flex;
-  flex-direction: column;
-  font-weight: 500;
-  font-size: 0.85rem;
-  color: #4b5563;
+  justify-content: center;
 }
 
 .filters-container select {
-  padding: 8px 12px;
-  border: 1px solid #cbd5e0;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   background-color: #fff;
-  font-size: 0.95rem;
-  width: auto;
-  min-width: unset;
-  max-width: 200px;
+  font-size: 1rem;
+  color: #1f2937;
+  min-width: 160px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: border 0.2s ease;
+}
+
+.filters-container select:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+.clear-filters-button {
+  padding: 10px 16px;
+  background-color: #0ea5e9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.clear-filters-button:hover {
+  background-color: #0284c7;
 }
 
 .media-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1.5rem;
 }
 
 .media-card {
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.05);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  transition: transform 0.2s ease;
-  height: 420px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
 .media-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 16px rgba(0,0,0,0.1);
 }
 
 .media-card img,
 .media-card video {
   width: 100%;
-  height: 200px;
+  height: 180px;
   object-fit: cover;
   border-radius: 8px;
+  background: #e5e7eb;
 }
 
 .media-card p {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #374151;
-  margin: 0.25rem 0;
+  margin: 6px 0;
 }
 
 .media-card p strong {
+  color: #111827;
   font-weight: 600;
-  color: #1e293b;
 }
 
 .delete-button {
   align-self: flex-start;
   padding: 6px 12px;
-  background-color: #64748b;
+  background-color: #ef4444;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background 0.3s ease;
   margin-top: auto;
+  transition: background 0.3s ease;
 }
 
 .delete-button:hover {
-  background-color: #475569;
+  background-color: #dc2626;
 }
 
 .no-media {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: #6b7280;
-  margin-top: 1rem;
+  text-align: center;
+  margin-top: 2rem;
 }
+
+/* Modal Styling */
 .media-modal {
   position: fixed;
   top: 0;
@@ -129,6 +146,9 @@
   max-height: 90%;
   display: flex;
   flex-direction: column;
+  background: black;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .media-modal-content img,
@@ -137,19 +157,16 @@
   max-height: 100%;
   border-radius: 8px;
   object-fit: contain;
-  background: black;
 }
 
 .media-description-overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
+  margin-top: 10px;
   padding: 12px 16px;
+  color: #f3f4f6;
   font-size: 1rem;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  background: rgba(31, 41, 55, 0.8);
+  border-radius: 6px;
+  text-align: center;
 }
 
 .media-modal-close {
@@ -161,4 +178,20 @@
   color: white;
   border: none;
   cursor: pointer;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+  .media-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clear-filters-button {
+    width: 100%;
+  }
 }

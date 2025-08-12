@@ -358,8 +358,7 @@ def delete_worker_media(media_id):
     claims = get_jwt()
     user_id = get_jwt_identity()
 
-    print("➡️ JWT user_id:", user_id)
-    print("➡️ JWT role:", claims['role'])
+    
 
     if claims['role'] != 'worker':
         return jsonify({'error': 'Unauthorized'}), 403
@@ -368,17 +367,17 @@ def delete_worker_media(media_id):
     if not media:
         return jsonify({'error': 'Media not found'}), 404
 
-    print("➡️ Media uploaded_by:", media.uploaded_by)
+    print(" Media uploaded_by:", media.uploaded_by)
 
     # ✅ Typecast to int to avoid mismatch
     if int(media.uploaded_by) != int(user_id):
-        print("❌ Uploaded_by mismatch – Forbidden")
+        print(" Uploaded_by mismatch – Forbidden")
         return jsonify({'error': 'You can only delete your own uploads'}), 403
 
     db.session.delete(media)
     db.session.commit()
 
-    print("✅ Media deleted")
+    print(" Media deleted")
     return jsonify({'message': 'Media deleted successfully'}), 200
 
 

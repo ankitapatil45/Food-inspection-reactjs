@@ -102,3 +102,10 @@ body {
   color: #6b7280;
   margin-top: 1rem;
 }
+
+.admin-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #f0f4f8;
+}

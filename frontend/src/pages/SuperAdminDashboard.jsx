@@ -32,7 +32,6 @@ export default function SuperAdminDashboard() {
       default:
         return (
           <div className="admin-welcome">
-            
             <h2 className="admin-title">Welcome, Super Admin</h2>
             <p className="admin-subtext">Use the sidebar menu to manage admins, workers, hotels, and media submissions.</p>
           </div>
@@ -42,7 +41,7 @@ export default function SuperAdminDashboard() {
 
   return (
     <div className="admin-dashboard-container">
-      <aside className="admin-sidebar">
+      <aside className="admin-sidebar scroll-on-hover">
         <div className="admin-info-section">
           <div className="admin-info-title">Super Admin Info</div>
           <div className="admin-info-item"><strong>Role:</strong> Super Admin</div>
