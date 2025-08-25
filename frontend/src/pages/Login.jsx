@@ -18,11 +18,10 @@ export default function Login() {
         email,
         password,
       });
- 
-      localStorage.setItem("token", res.data.access_token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
- 
-      
+
+      sessionStorage.setItem("token", res.data.access_token);
+      sessionStorage.setItem("user", JSON.stringify(res.data.user));
+
       const role = res.data.user.role;
  
       if (role === "superadmin") {

@@ -10,7 +10,7 @@ import { FaUserCog, FaListAlt, FaHotel, FaUsers, FaPhotoVideo } from 'react-icon
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('welcome');
-  const admin = JSON.parse(localStorage.getItem('user'));
+  const admin = JSON.parse(sessionStorage.getItem('user'));
 
   const options = [
     { title: 'Manage Workers', section: 'workers', icon: <FaUserCog /> },

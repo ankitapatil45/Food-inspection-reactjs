@@ -18,14 +18,14 @@ export default function App() {
   const [role, setRole] = useState("");
  
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("role");
+    const token = sessionStorage.getItem("token");
+    const userRole = sessionStorage.getItem("role");
     setIsLoggedIn(!!token);
     setRole(userRole || "");
   }, [location.pathname]);
  
   const handleLogout = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       await axios.post("/api/logout", {}, {
         headers: { Authorization: `Bearer ${token}` },
@@ -33,9 +33,9 @@ export default function App() {
     } catch (err) {
       console.error("Logout failed", err);
     } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("username");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("role");
+      sessionStorage.removeItem("username");
       setIsLoggedIn(false);
       setRole("");
       alert("Logged out successfully");

@@ -9,7 +9,7 @@ import { FaHotel, FaVideo, FaPhotoVideo, FaMapMarkerAlt } from 'react-icons/fa';
 
 export default function WorkerDashboard() {
   const [activeSection, setActiveSection] = useState('welcome');
-  const worker = JSON.parse(localStorage.getItem('user'));
+  const worker = JSON.parse(sessionStorage.getItem('user'));
 
   const options = [
     { title: 'View Hotels', section: 'hotels', icon: <FaHotel /> },

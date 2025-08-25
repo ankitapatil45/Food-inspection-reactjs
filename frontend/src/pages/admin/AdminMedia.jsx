@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import "./AdminMedia.css";
-
+ 
 function AdminMedia() {
   const [media, setMedia] = useState([]);
   const [filters, setFilters] = useState({
@@ -11,7 +13,8 @@ function AdminMedia() {
   });
   const [dropdowns, setDropdowns] = useState({ hotels: [], workers: [] });
   const [modalMedia, setModalMedia] = useState(null);
-  const token = localStorage.getItem("token");
+  const [mapLocation, setMapLocation] = useState(null); // 🔹 Map popup
+  const token = sessionStorage.getItem("token");
 
   const fetchDropdownOptions = async () => {
     try {
@@ -23,7 +26,7 @@ function AdminMedia() {
       console.error("Error loading dropdown options", err);
     }
   };
-
+ 
   const fetchMedia = async () => {
     try {
       const query = new URLSearchParams(filters).toString();
@@ -35,10 +38,10 @@ function AdminMedia() {
       console.error("Error fetching media", err);
     }
   };
-
+ 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this media?")) return;
-
+ 
     try {
       await axios.delete(`/api/media/admin/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -48,26 +51,34 @@ function AdminMedia() {
       console.error("Failed to delete", err);
     }
   };
-
+ 
   const formatLocation = (loc) => {
     if (!loc) return "N/A";
     const [lat, lon] = loc.split(",");
     return `Lat: ${lat?.trim()}, Lon: ${lon?.trim()}`;
   };
-
+ 
+  const handleViewLocation = (loc) => {
+    if (!loc) return;
+    const [lat, lon] = loc.split(",").map((v) => parseFloat(v.trim()));
+    setMapLocation({ lat, lon });
+  };
+ 
+  const closeMap = () => setMapLocation(null);
+ 
   useEffect(() => {
     fetchDropdownOptions();
     fetchMedia();
   }, []);
-
+ 
   useEffect(() => {
     fetchMedia();
   }, [filters]);
-
+ 
   return (
     <div className="admin-media-container">
       <h2 className="media-title">Submitted Media</h2>
-
+ 
       {/* Filters Section */}
       <div className="filters-container">
         <select
@@ -79,7 +90,7 @@ function AdminMedia() {
             <option key={h.id} value={h.id}>{h.name}</option>
           ))}
         </select>
-
+ 
         <select
           value={filters.worker_id}
           onChange={(e) => setFilters({ ...filters, worker_id: e.target.value })}
@@ -89,7 +100,7 @@ function AdminMedia() {
             <option key={w.id} value={w.id}>{w.name}</option>
           ))}
         </select>
-
+ 
         <select
           value={filters.media_type}
           onChange={(e) => setFilters({ ...filters, media_type: e.target.value })}
@@ -98,7 +109,7 @@ function AdminMedia() {
           <option value="image">Image</option>
           <option value="video">Video</option>
         </select>
-
+ 
         <button
           className="clear-btn"
           onClick={() =>
@@ -108,7 +119,7 @@ function AdminMedia() {
           Clear Filters
         </button>
       </div>
-
+ 
       {/* Media Grid */}
       <div className="media-grid">
         {media.map((m) => (
@@ -124,22 +135,30 @@ function AdminMedia() {
                 <video src={m.file_url} className="media-thumbnail" muted />
               )}
             </div>
-
+ 
             <div className="media-info">
               <p className="type-label">{m.media_type.toUpperCase()}</p>
               <p><strong>By:</strong> {m.worker?.name}</p>
               <p><strong>Hotel:</strong> {m.hotel?.name}</p>
               <p><strong>Date:</strong> {m.uploaded_at}</p>
               <p><strong>Location:</strong> {formatLocation(m.location)}</p>
+              {m.location && (
+                <button
+                  className="view-location-button"
+                  onClick={() => handleViewLocation(m.location)}
+                >
+                  View Location
+                </button>
+              )}
             </div>
-
+ 
             <button className="delete-btn" onClick={() => handleDelete(m.id)}>
               Delete
             </button>
           </div>
         ))}
       </div>
-
+ 
       {/* Modal */}
       {modalMedia && (
         <div className="media-modal" onClick={() => setModalMedia(null)}>
@@ -154,8 +173,30 @@ function AdminMedia() {
           </div>
         </div>
       )}
+ 
+      {/* Map Popup */}
+      {mapLocation && (
+        <div className="map-popup" onClick={closeMap}>
+          <div className="map-popup-content" onClick={(e) => e.stopPropagation()}>
+            <MapContainer
+              center={[mapLocation.lat, mapLocation.lon]}
+              zoom={15}
+              style={{ height: "300px", width: "100%" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <Marker position={[mapLocation.lat, mapLocation.lon]}>
+                <Popup>Uploaded Location</Popup>
+              </Marker>
+            </MapContainer>
+            <button className="map-close-button" onClick={closeMap}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
+ 
 export default AdminMedia;

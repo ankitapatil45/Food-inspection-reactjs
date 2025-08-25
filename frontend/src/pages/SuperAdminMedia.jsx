@@ -1,8 +1,11 @@
 // --- React Code (SuperAdminMedia.jsx) ---
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "./SuperAdminMedia.css";
-
+ 
 function SuperAdminMedia() {
   const [media, setMedia] = useState([]);
   const [areas, setAreas] = useState([]);
@@ -12,8 +15,9 @@ function SuperAdminMedia() {
   const [allWorkers, setAllWorkers] = useState([]);
   const [filters, setFilters] = useState({ area_id: '', hotel_id: '', worker_id: '', media_type: '' });
   const [selectedMedia, setSelectedMedia] = useState(null);
+  const [mapLocation, setMapLocation] = useState(null); // 🔹 
 
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   const fetchDropdownOptions = async () => {
     try {
@@ -29,7 +33,7 @@ function SuperAdminMedia() {
       console.error("Error loading options", err);
     }
   };
-
+ 
   const fetchMedia = async () => {
     try {
       const query = new URLSearchParams(filters).toString();
@@ -41,11 +45,11 @@ function SuperAdminMedia() {
       console.error("Error fetching media", err);
     }
   };
-
+ 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this media?");
     if (!confirmDelete) return;
-
+ 
     try {
       await axios.delete(`/api/media/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -55,38 +59,38 @@ function SuperAdminMedia() {
       console.error("Failed to delete", err);
     }
   };
-
+ 
   useEffect(() => {
     fetchDropdownOptions();
     fetchMedia();
   }, []);
-
+ 
   useEffect(() => {
     fetchMedia();
   }, [filters]);
-
+ 
   useEffect(() => {
     let cityId = filters.area_id;
-
+ 
     if (filters.hotel_id) {
       const hotel = allHotels.find(h => h.id == filters.hotel_id);
       if (hotel) {
         cityId = hotel.city_id;
       }
     }
-
+ 
     const filteredHotels = filters.area_id
       ? allHotels.filter(h => h.city_id == filters.area_id)
       : allHotels;
-
+ 
     const filteredWorkers = cityId
       ? allWorkers.filter(w => w.city_id == cityId)
       : allWorkers;
-
+ 
     setHotels(filteredHotels);
     setWorkers(filteredWorkers);
   }, [filters.area_id, filters.hotel_id, allHotels, allWorkers]);
-
+ 
   const formatLocation = (loc) => {
     if (!loc) return null;
     const parts = loc.split(",");
@@ -94,18 +98,27 @@ function SuperAdminMedia() {
     const [lat, lon] = parts;
     return `Lat: ${lat.trim()}, Lon: ${lon.trim()}`;
   };
-
+ 
   const closeModal = () => setSelectedMedia(null);
-
+ 
   const clearFilters = () => {
     setFilters({ area_id: '', hotel_id: '', worker_id: '', media_type: '' });
   };
-
+ 
+  const handleViewLocation = (loc) => {
+    if (!loc) return;
+    const [lat, lon] = loc.split(",").map((v) => parseFloat(v.trim()));
+    setMapLocation({ lat, lon });
+  };
+ 
+  const closeMap = () => setMapLocation(null);
+ 
   return (
     <div className="worker-media-wrapper">
       <div className="worker-media-container">
         <h2 className="media-title">All Uploaded Media (Super Admin View)</h2>
-
+ 
+        {/* Filters */}
         <div className="filters-container">
           <select
             value={filters.area_id}
@@ -116,7 +129,7 @@ function SuperAdminMedia() {
               <option key={a.id} value={a.id}>{a.name}</option>
             ))}
           </select>
-
+ 
           <select
             value={filters.hotel_id}
             onChange={(e) => setFilters({ ...filters, hotel_id: e.target.value })}
@@ -126,7 +139,7 @@ function SuperAdminMedia() {
               <option key={h.id} value={h.id}>{h.name}</option>
             ))}
           </select>
-
+ 
           <select
             value={filters.worker_id}
             onChange={(e) => setFilters({ ...filters, worker_id: e.target.value })}
@@ -136,7 +149,7 @@ function SuperAdminMedia() {
               <option key={w.id} value={w.id}>{w.name}</option>
             ))}
           </select>
-
+ 
           <select
             value={filters.media_type}
             onChange={(e) => setFilters({ ...filters, media_type: e.target.value })}
@@ -145,10 +158,11 @@ function SuperAdminMedia() {
             <option value="image">Image</option>
             <option value="video">Video</option>
           </select>
-
+ 
           <button className="clear-filters-button" onClick={clearFilters}>Clear Filters</button>
         </div>
-
+ 
+        {/* Media Grid */}
         {media.length === 0 ? (
           <p className="no-media">No media found.</p>
         ) : (
@@ -163,8 +177,17 @@ function SuperAdminMedia() {
                 <p><strong>Type:</strong> {m.media_type}</p>
                 <p><strong>Hotel:</strong> {m.hotel?.name || "Unknown"}</p>
                 <p><strong>Uploaded by:</strong> {m.uploaded_by_name || "Unknown"}</p>
-                <p><strong>Location:</strong> {formatLocation(m.location) || "N/A"}</p>
                 <p><strong>Date:</strong> {m.uploaded_at}</p>
+                <p><strong>Location:</strong> {formatLocation(m.location) || "N/A"}</p>
+                {m.location && (
+                  <button
+                    className="view-location-button"
+                    onClick={(e) => { e.stopPropagation(); handleViewLocation(m.location); }}
+                  >
+                    View Location
+                  </button>
+                )}
+                
                 <button onClick={(e) => { e.stopPropagation(); handleDelete(m.id); }} className="delete-button">
                   Delete
                 </button>
@@ -172,7 +195,8 @@ function SuperAdminMedia() {
             ))}
           </div>
         )}
-
+ 
+        {/* Media Preview Modal */}
         {selectedMedia && (
           <div className="media-modal" onClick={closeModal}>
             <div className="media-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -188,10 +212,27 @@ function SuperAdminMedia() {
             </div>
           </div>
         )}
+ 
+        {/* Map Popup */}
+        {mapLocation && (
+          <div className="map-popup" onClick={closeMap}>
+            <div className="map-popup-content" onClick={(e) => e.stopPropagation()}>
+              <MapContainer center={[mapLocation.lat, mapLocation.lon]} zoom={15} style={{ height: "300px", width: "100%" }}>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution="&copy; OpenStreetMap contributors"
+                />
+                <Marker position={[mapLocation.lat, mapLocation.lon]}>
+                  <Popup>Uploaded Location</Popup>
+                </Marker>
+              </MapContainer>
+              <button className="map-close-button" onClick={closeMap}>Close</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
+ 
 export default SuperAdminMedia;
-

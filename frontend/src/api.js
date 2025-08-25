@@ -8,7 +8,7 @@ const API = axios.create({
 
 // ✅ Attach token to every request
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -17,7 +17,7 @@ API.interceptors.request.use((config) => {
 
 // 🔐 Optional: Token getter
 export const getAuthToken = () => {
-  return localStorage.getItem("token");
+  return sessionStorage.getItem("token");
 };
 
 // 🟢 LOGIN
@@ -77,8 +77,8 @@ export const createHotel = async (hotelData) => {
 
 // 🟢 GET Hotels (admin + worker + superadmin)
 export const getHotels = async () => {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("userRole");
+  const token = sessionStorage.getItem("token");
+  const role = sessionStorage.getItem("userRole");
 
   let url = "/hotels"; // default for admin/superadmin
   if (role === "worker") {

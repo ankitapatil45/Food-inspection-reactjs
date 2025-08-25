@@ -8,7 +8,7 @@ function WorkerMedia() {
   const [filters, setFilters] = useState({ hotel_id: '', media_type: '' });
   const [selectedMedia, setSelectedMedia] = useState(null);
 
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   const fetchHotelOptions = async () => {
     try {

@@ -1,5 +1,5 @@
 export function getUserRole() {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (!token) return null;
 
   const payload = token.split('.')[1];
@@ -11,7 +11,7 @@ export function getUserRole() {
 }
 
 export function decodeJWT() {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (!token) return null;
 
   try {
